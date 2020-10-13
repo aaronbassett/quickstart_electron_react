@@ -1,5 +1,6 @@
 const electron = require("electron");
 const path = require("path");
+const Realm = require("realm");
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -7,6 +8,8 @@ const BrowserWindow = electron.BrowserWindow;
 let mainWindow;
 
 function createWindow() {
+  console.log("main process: Realm:\t", Realm);
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,

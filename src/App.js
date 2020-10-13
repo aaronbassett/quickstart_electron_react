@@ -1,8 +1,10 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import Realm from "realm";
 
 function App() {
+  console.log("renderer process: Realm:\t", Realm);
   return (
     <div className="App">
       <header className="App-header">
