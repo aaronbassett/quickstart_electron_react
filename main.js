@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const Realm = require("realm");
+const ObjectId = require("bson").ObjectId;
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -41,7 +42,13 @@ app.whenReady().then(async () => {
   // Get all Persons in the realm
 
   const persons = realm.objects("Person");
-
+  // create a new "Person"
+  realm.write(() => {
+    realm.create("Person", {
+      _id: new ObjectId(),
+      name: "Robb Stark",
+    });
+  });
   // when receiving an "asynchronous-message" from the renderer process,
   // upload all local changes to the synced realm
 
@@ -51,8 +58,8 @@ app.whenReady().then(async () => {
 
       console.log("main process: Syncing all local changes");
       console.log(
-        `main process: Created person object: \t ${JSON.stringify(
-          persons[0],
+        `main process: Created persons object: \t ${JSON.stringify(
+          persons,
           null,
           2
         )}`
@@ -62,7 +69,9 @@ app.whenReady().then(async () => {
 
       event.reply(
         "asynchronous-reply",
-        `created person object with the name ${persons[0].name}`
+        `created persons object with the name ${
+          persons[persons.length - 1].name
+        }`
       );
     }
   });

@@ -31,7 +31,7 @@ async function run() {
   realm.write(() => {
     realm.create("Person", {
       _id: new ObjectId(),
-      name: "John Smith",
+      name: "Jon Snow",
     });
   });
 
@@ -42,6 +42,10 @@ async function run() {
   ipcRenderer.on("asynchronous-reply", (event, arg) => {
     console.log(`renderer process:`, arg);
   });
+
+  // close local realm
+  realm.close();
+  console.log("realm shouldve closed");
 }
 
 run();
