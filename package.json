@@ -37,6 +37,6 @@
     "electron": "^10.1.3",
     "webpack-node-externals": "^2.5.2"
   },
-  "main": "public/electron.js",
+  "main": "main.js",
   "homepage": "./"
 }
