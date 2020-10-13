@@ -39,6 +39,12 @@ app.whenReady().then(async () => {
 
   const realm = await Realm.open(config);
 
+  // DELETE LATER - JUST FOR DEV PURPOSES:
+  realm.write(() => {
+    // Delete all objects from the realm.
+    realm.deleteAll();
+  });
+
   // Get all Persons in the realm
 
   const persons = realm.objects("Person");

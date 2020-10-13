@@ -41,11 +41,11 @@ async function run() {
 
   ipcRenderer.on("asynchronous-reply", (event, arg) => {
     console.log(`renderer process:`, arg);
-  });
 
-  // close local realm
-  realm.close();
-  console.log("realm shouldve closed");
+    // close local realm
+    realm.close();
+    console.log("realm shouldve closed");
+  });
 }
 
 run();
