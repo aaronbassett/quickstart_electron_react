@@ -1,27 +1,71 @@
-const electron = require("electron");
-const path = require("path");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const Realm = require("realm");
 
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-
-let mainWindow;
-
 function createWindow() {
-  console.log("main process: Realm:\t", Realm);
-
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: { nodeIntegration: true },
+  const mainWindow = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
-  // and load the index.html of the app.
-  console.log(__dirname);
-  mainWindow.loadFile(path.join(__dirname, "./build/index.html"));
+
+  mainWindow.loadFile("./build/index.html");
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.whenReady().then(async () => {
+  const realmApp = new Realm.App({ id: "tutsbrawl-qfxxj" }); // Replace <Your App ID> with your application id
+  let credentials = Realm.Credentials.anonymous();
+  // log in anonymously
+  let user = await realmApp.logIn(credentials);
+
+  const PersonSchema = {
+    name: "Person",
+    properties: {
+      _id: "objectId",
+      name: "string",
+    },
+    primaryKey: "_id",
+  };
+
+  const config = {
+    schema: [PersonSchema],
+    path: "myrealm.realm",
+    sync: {
+      user: user,
+      partitionValue: "My Partition",
+    },
+  };
+  // open a synced realm
+
+  const realm = await Realm.open(config);
+
+  // Get all Persons in the realm
+
+  const persons = realm.objects("Person");
+
+  // when receiving an "asynchronous-message" from the renderer process,
+  // upload all local changes to the synced realm
+
+  ipcMain.on("asynchronous-message", (event, arg) => {
+    if (arg === "sync") {
+      realm.syncSession.uploadAllLocalChanges();
+
+      console.log("main process: Syncing all local changes");
+      console.log(
+        `main process: Created person object: \t ${JSON.stringify(
+          persons[0],
+          null,
+          2
+        )}`
+      );
+
+      // send a reply to the renderer process with the created person's name
+
+      event.reply(
+        "asynchronous-reply",
+        `created person object with the name ${persons[0].name}`
+      );
+    }
+  });
+
+  createWindow();
+});
